@@ -10,9 +10,9 @@ You can refer to [OpenCOOD data introduction](https://opencood.readthedocs.io/en
 # Data Preparation
 
 mkdir a dataset folder under RoCo. Put your OPV2V, V2XSet, DAIR-V2X data in this folder. You just need to put in the dataset you want to use.
-RoCo/dataset
+RoCo/dataset. All data configurations are the same as [CoAlign](https://github.com/yifanlu0227/CoAlign?tab=readme-ov-file). For details, please refer to CoAlign.
 
-. 
+```
 ├── my_dair_v2x 
 │   ├── v2x_c
 │   ├── v2x_i
@@ -26,6 +26,8 @@ RoCo/dataset
 │   ├── test
 │   ├── train
 │   └── validate
+```
+
 
 #  Acknowlege
 This project is impossible without the code of OpenCOOD, g2opy and d3d.
