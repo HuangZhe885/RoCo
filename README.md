@@ -32,6 +32,15 @@ RoCo/dataset. All data configurations are the same as [CoAlign](https://github.c
 #  Acknowlege
 This project is impossible without the code of OpenCOOD, g2opy and d3d.
 
-Thanks again to [@DerrickXuNu](https://github.com/DerrickXuNu) and [@yifanlu0227](https://github.com/yifanlu0227)  for the great code framework.
+Thanks to [@DerrickXuNu](https://github.com/DerrickXuNu) and [@yifanlu0227](https://github.com/yifanlu0227)  for the great code framework.
+
+Once again, my sincere thanks to [@yifanlu0227](https://github.com/yifanlu0227)  for his patient and meticulous help.
+
+
+
+
+
+
+
 
 
