@@ -310,41 +310,41 @@ def getIntermediateFusionDataset(cls):
             # box align to correct pose.
             # stage1_content contains all agent. Even out of comm range.
             if self.box_align and str(idx) in self.stage1_result.keys():
-                # print("3D框对其的运算============")
+                # print("3============")
                 from opencood.models.sub_modules.box_align_v2 import box_alignment_relative_sample_np
                 stage1_content = self.stage1_result[str(idx)]
                 if stage1_content is not None:
-                    all_agent_id_list = stage1_content['cav_id_list'] # include those out of range  #所有代理的ID
-                    all_agent_corners_list = stage1_content['pred_corner3d_np_list']   #所有代理3D框的角点坐标
-                    all_agent_uncertainty_list = stage1_content['uncertainty_np_list']  #代理不确定数据
+                    all_agent_id_list = stage1_content['cav_id_list'] # include those out of range  #
+                    all_agent_corners_list = stage1_content['pred_corner3d_np_list']   #
+                    all_agent_uncertainty_list = stage1_content['uncertainty_np_list']  #
 
-                    cur_agent_id_list = cav_id_list   #获取当前代理的ID
-                    cur_agent_pose = [base_data_dict[cav_id]['params']['lidar_pose'] for cav_id in cav_id_list]  #当前代理的姿态信息 
-                    cur_agnet_pose = np.array(cur_agent_pose)  #创建数组存储当前代理的姿态
-                    cur_agent_in_all_agent = [all_agent_id_list.index(cur_agent) for cur_agent in cur_agent_id_list] # indexing current agent in `all_agent_id_list` 查找当前代理的索引
+                    cur_agent_id_list = cav_id_list   #
+                    cur_agent_pose = [base_data_dict[cav_id]['params']['lidar_pose'] for cav_id in cav_id_list]  #
+                    cur_agnet_pose = np.array(cur_agent_pose)  #
+                    cur_agent_in_all_agent = [all_agent_id_list.index(cur_agent) for cur_agent in cur_agent_id_list] # indexing current agent in `all_agent_id_list`
                     
                     current_time = datetime.now()
-                    # 将初始数据写入到agent_pose_info_before_processing.txt文件中
+                    # agent_pose_info_before_processing.txt
                     with open('agent_pose_info_before_processing.txt', 'a') as f:
                         for cav_id, lidar_pose in zip(cav_id_list, cur_agnet_pose):
-                            # 将时间、代理ID和姿态信息写入文件
+                            # 
                             f.write(f"{cav_id} {' '.join(map(str, lidar_pose))}\n")
 
-                    # 当前代理的3D框角点坐标
+                    # 
                     pred_corners_list = [np.array(all_agent_corners_list[cur_in_all_ind], dtype=np.float64) 
                                             for cur_in_all_ind in cur_agent_in_all_agent]
-                    # 当前代理的不确定数据
+                    # 
                     uncertainty_list = [np.array(all_agent_uncertainty_list[cur_in_all_ind], dtype=np.float64) 
                                             for cur_in_all_ind in cur_agent_in_all_agent]
-                    # 检查 pred_corners_list 中所有预测角点的数量是否不等于0，如果是
-                    #根据代理坐标、当前代理的姿态信息和不确定性数据来计算调整后的姿态 refined_pose。
+                    # 
+                    # refined_pose。
                     if sum([len(pred_corners) for pred_corners in pred_corners_list]) != 0:
                         refined_pose = box_alignment_relative_sample_np(pred_corners_list,
                                                                         cur_agnet_pose, 
                                                                         uncertainty_list=uncertainty_list, 
                                                                         **self.box_align_args)
-                        cur_agnet_pose[:,[0,1,4]] = refined_pose   #更新姿态信息
-                        #遍历 cav_id_list， 更新姿态
+                        cur_agnet_pose[:,[0,1,4]] = refined_pose   #
+                        # cav_id_list， 
                         for i, cav_id in enumerate(cav_id_list):
                             lidar_pose_list[i] = cur_agnet_pose[i].tolist()
                             base_data_dict[cav_id]['params']['lidar_pose'] = cur_agnet_pose[i].tolist()
@@ -352,18 +352,18 @@ def getIntermediateFusionDataset(cls):
                     with open('agent_pose_info_after_processing.txt', 'a') as f:
                         for cav_id, lidar_pose in zip(cav_id_list, cur_agnet_pose):
                             
-                            # 将时间、代理ID和更新后的姿态信息写入文件
+                            # 
                             f.write(f"{cav_id} {' '.join(map(str, lidar_pose))}\n")
 
-                    # 3.22ws修改，增加循环更新
+                    # 3.22ws
                     # for _ in range(3):
                     #     if sum([len(pred_corners) for pred_corners in pred_corners_list]) != 0:
                     #         refined_pose = box_alignment_relative_sample_np(pred_corners_list,
                     #                                                         cur_agnet_pose, 
                     #                                                         uncertainty_list=uncertainty_list, 
                     #                                                         **self.box_align_args)
-                    #         cur_agnet_pose[:,[0,1,4]] = refined_pose   #更新姿态信息
-                    #         #遍历 cav_id_list， 更新姿态
+                    #         cur_agnet_pose[:,[0,1,4]] = refined_pose   #
+                    #         # cav_id_list， 
                     #         for i, cav_id in enumerate(cav_id_list):
                     #             lidar_pose_list[i] = cur_agnet_pose[i].tolist()
                     #             base_data_dict[cav_id]['params']['lidar_pose'] = cur_agnet_pose[i].tolist()
