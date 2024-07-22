@@ -27,6 +27,11 @@ RoCo/dataset. All data configurations are the same as [CoAlign](https://github.c
 │   ├── train
 │   └── validate
 ```
+# Checkpoints and Results
+[RoCo_V2XSet]()
+
+[RoCo_DAIR_V2X]
+
 #  How to use
 1.  We are improving our project platform based on CoAlign. You just need to replace the `box_align_v2.py` and `intermedia_fusion_dataset.py` files.
 
