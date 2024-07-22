@@ -97,7 +97,7 @@ def all_pair_l2(A, B):
         )
     return C
 
-# 计算从a1到a2的相对位姿 和 从b1到b2的相对位姿，然后计算两者的差别
+
 def compute_edge(a1, a2, b1, b2, pred_center_world_cat):
     """
     Args:
@@ -120,22 +120,22 @@ def compute_edge(a1, a2, b1, b2, pred_center_world_cat):
 
 
 def compute_graph_similarity_only_edge(idx, idx_candidate, pre_candidate_set, pred_len, box_idx_to_agent, pred_center_world_cat):
-    agent_idx = box_idx_to_agent[idx]  #获取idx对应的代理id
-    agent_candidate = box_idx_to_agent[idx_candidate]  #获取idx_candidate对应的代理id
+    agent_idx = box_idx_to_agent[idx] 
+    agent_candidate = box_idx_to_agent[idx_candidate]  
 
     begin_idx = sum(pred_len[:agent_idx])
     end_idx = begin_idx + pred_len[agent_idx]
     graph_idx = []
     graph_candidate = []
     for i in range(begin_idx, end_idx):
-        if box_idx_to_agent[i] == agent_idx and idx != i:  # 同属于一个agent
-            if len(pre_candidate_set[i]) >= 1:  # 该邻居节点的候选集不为空
+        if box_idx_to_agent[i] == agent_idx and idx != i:  
+            if len(pre_candidate_set[i]) >= 1:  
                 count = 0
                 for j in pre_candidate_set[i]:
                     if box_idx_to_agent[j] == agent_candidate:
                         count += 1
                     
-                if count == 1:  # 只有一个属于agent_candidate
+                if count == 1: 
                     graph_idx.append(i)
                     graph_candidate.append(j)
 
@@ -143,7 +143,7 @@ def compute_graph_similarity_only_edge(idx, idx_candidate, pre_candidate_set, pr
     for i in range(len(graph_idx)):
         edge_diff = compute_edge(idx, graph_idx[i], idx_candidate, graph_candidate[i], pred_center_world_cat) # / len(graph_candidate[i])
         score += math.exp(-np.linalg.norm(edge_diff))
-    # 求平均
+
     if len(graph_idx) > 0:
         score /= len(graph_idx)
         # print("graph score:", score)
@@ -156,7 +156,7 @@ def compute_graph_similarity_only_distance(idx, idx_candidate, pre_candidate_set
     score = distance_score
     return score
 
-# 计算idx为中心的子图与以idx_candidate为中心的子图之间的相似度
+
 def compute_graph_similarity(idx, idx_candidate, pre_candidate_set, pred_len, box_idx_to_agent, pred_center_world_cat):
     """
     Args:
@@ -176,33 +176,33 @@ def compute_graph_similarity(idx, idx_candidate, pre_candidate_set, pred_len, bo
         similarity: float
             the similarity between two graphs
     """
-    agent_idx = box_idx_to_agent[idx]  #获取idx对应的代理id
-    agent_candidate = box_idx_to_agent[idx_candidate]  #获取idx_candidate对应的代理id
+    agent_idx = box_idx_to_agent[idx]  
+    agent_candidate = box_idx_to_agent[idx_candidate]  
 
-    # 选取idx为中心的子图的其他顶点，选择的标准是同属于一个agent，且对应候选集中的box中属于该agent的只有一个
+   
     begin_idx = sum(pred_len[:agent_idx])
     end_idx = begin_idx + pred_len[agent_idx]
     graph_idx = []
     graph_candidate = []
     for i in range(begin_idx, end_idx):
-        if box_idx_to_agent[i] == agent_idx and idx != i:  # 同属于一个agent
-            if len(pre_candidate_set[i]) >= 1:  # 该邻居节点的候选集不为空
-                # 判断该邻居节点的候选集中是否只有一个属于该agent，如果没有该agent或有多个属于该agent，则跳过
+        if box_idx_to_agent[i] == agent_idx and idx != i:  
+            if len(pre_candidate_set[i]) >= 1:  
+                
                 count = 0
                 for j in pre_candidate_set[i]:
                     if box_idx_to_agent[j] == agent_candidate:
                         count += 1
                     
-                if count == 1:  # 只有一个属于agent_candidate
+                if count == 1:  
                     graph_idx.append(i)
                     graph_candidate.append(j)
     
-    if (len(graph_idx) == 0):  # 表示所有的agent暂时都没有确定的邻居节点
+    if (len(graph_idx) == 0): 
         print("--------------no right graph----------------")
         print("--------------relax the thera----------------")
-        # 当前agent的检测框数量要大于1，否则直接返回-1
+       
 
-        # 下面是松弛条件
+       
         # if pred_len[agent_idx] <= 1:
         #     return -1
         # #
@@ -210,16 +210,16 @@ def compute_graph_similarity(idx, idx_candidate, pre_candidate_set, pred_len, bo
         # while(len(graph_idx) <= 1):
         #     limits += 1
         #     for i in range(begin_idx, end_idx):
-        #         if box_idx_to_agent[i] == agent_idx and idx != i:  # 同属于一个agent
-        #             if len(pre_candidate_set[i]) >= 1 and i not in graph_idx:  # 该邻居节点的候选集不为空,且不在图中
+        #         if box_idx_to_agent[i] == agent_idx and idx != i:  
+        #             if len(pre_candidate_set[i]) >= 1 and i not in graph_idx:  
         #                 count = 0
         #                 for j in pre_candidate_set[i]:
         #                     if box_idx_to_agent[j] == agent_candidate:
         #                         count += 1
-        #                 if count == limits:  # 只有一个属于agent_candidate
+        #                 if count == limits:  
         #                     graph_idx.append(i)
         #                     graph_candidate.append(j)
-        #     if (limits > len(pred_len)): # 表示没有合适的
+        #     if (limits > len(pred_len)): 
         #         return -1
 
 
@@ -227,7 +227,7 @@ def compute_graph_similarity(idx, idx_candidate, pre_candidate_set, pred_len, bo
     for i in range(len(graph_idx)):
         edge_diff = compute_edge(idx, graph_idx[i], idx_candidate, graph_candidate[i], pred_center_world_cat) # / len(graph_candidate[i])
         score += math.exp(-np.linalg.norm(edge_diff))
-    # 求平均
+
     if len(graph_idx) > 0:
         score /= len(graph_idx)
         print("graph score:", score)
@@ -240,7 +240,7 @@ def compute_graph_similarity(idx, idx_candidate, pre_candidate_set, pred_len, bo
     
     distance_score = math.exp(-np.linalg.norm(pred_center_world_cat[idx] - pred_center_world_cat[idx_candidate]))
     score += distance_score
-    # 如果只用edge，就注释上面一行，但效果会很差
+   
     
     # print(idx, idx_candidate, score)
     
@@ -254,38 +254,38 @@ def weighted_bipartite_matching_hopcroft_karp(idx_set: set, candidate_idx_set: s
     print("candidate_idx_set", candidate_idx_set)
     print("candidate_set", candidate_set)
     print("candidate_set_score", candidate_set_score)
-    # 创建一个带权重的二部图
+  
     G = nx.Graph()
 
 
-    # 添加代理节点
+   
     left_nodes = list(idx_set)
     right_nodes = list(candidate_idx_set)
     # print("left_nodes",left_nodes)
     # print("right_nodes",right_nodes)
 
-    # 添加节点到图中
-    G.add_nodes_from(left_nodes, bipartite=0)  # 代理节点
-    G.add_nodes_from(right_nodes, bipartite=1)  # 目标节点
+ 
+    G.add_nodes_from(left_nodes, bipartite=0)  
+    G.add_nodes_from(right_nodes, bipartite=1)  
 
     # print("nodes ::", G.nodes())
     # print(candidate_set)
     # print(candidate_set_score)
 
-    # 添加权重边
+
     for i in range(len(left_nodes)):
         for j in range(len(candidate_set[left_nodes[i]])):
             G.add_edge(left_nodes[i], candidate_set[left_nodes[i]][j], weight=candidate_set_score[left_nodes[i]][j])
 
-    # 添加边并赋予权重
+   
     # for i in range(left_nodes):
     #     for j in range(num_targets):
-    #         G.add_edge(i, j + num_agents, weight=weights[i, j])  # 注意将权重取负号，因为 NetworkX 默认找最小权重匹配
+    #         G.add_edge(i, j + num_agents, weight=weights[i, j])  
 
-    # 使用 Hopcroft-Karp 算法求解
+   
     matching = nx.bipartite.matching.hopcroft_karp_matching(G, top_nodes=left_nodes)
 
-    # 提取匹配结果
+
     # matched_pairs = [(agent, target - num_agents) for left, right in matching.items() if agent in agent_nodes]
     matched_pairs = [(left, right) for left, right in matching.items() ]
 
@@ -303,26 +303,26 @@ def multi_weighted_bipartite_matching_hopcroft_karp(idx_set: set, candidate_idx_
     elif agent_number == 2:
         return weighted_bipartite_matching_hopcroft_karp(idx_set, candidate_idx_set, candidate_set, candidate_set_score)
 
-    # 3个及以上个agent的情况，需要图融合
+
     
 
     return 
 
-# 使用HK来做最终的匹配，bug
+# use HK
 def box_alignment_relative_sample_np(
-            pred_corners_list,     #当前代理的3D框坐标列表
-            noisy_lidar_pose,      #代理的姿态信息，包括位置和朝向
+            pred_corners_list,     
+            noisy_lidar_pose,     
             uncertainty_list=None, 
-            landmark_SE2=True,   #landmark类型为SE2
+            landmark_SE2=True,  
             adaptive_landmark=False,
             normalize_uncertainty=False,
             abandon_hard_cases = False,
-            drop_hard_boxes = False,  ##放弃处理困难的框
-            drop_unsure_edge = False, #放弃处理不确定的情况
+            drop_hard_boxes = False, 
+            drop_unsure_edge = False, 
             use_uncertainty = True,
-            thres = 1.5,     #确定相邻框的距离阈值
-            yaw_var_thres = 0.2,    #用于确定框姿态角差异的阈值
-            max_iterations = 1000):  #最优迭代的最大次数
+            thres = 1.5,    
+            yaw_var_thres = 0.2,   
+            max_iterations = 1000):  
     """ Perform box alignment for one sample. 
     Correcting the relative pose.
 
@@ -360,31 +360,31 @@ def box_alignment_relative_sample_np(
     print("noisy_lidar_pose_GT",noisy_lidar_pose)
     print("noisy_lidar_poseGT_SHAPE",noisy_lidar_pose.shape)
     
-    # 将数据附加到TXT文件的末尾
+
     # with open('/home/hz/code/opencood/logs/Other_results/noisy_lidar_pose_beforeAlign.txt', 'a') as f:
     #     for row in noisy_lidar_pose:
     #         f.write(' '.join(map(str, row)) + '\n')
 
     # print("Data has been appended to noisy_lidar_pose_beforeAlign.txt file.")
-    # print("图优化开始=====")
+  
     if not use_uncertainty:
         uncertainty_list = None
     ## first transform point from ego coordinate to world coordinate, using lidar_pose.
-    order = 'lwh'  # hwl  定义框的尺寸顺序为长度，宽度，高度
-    N = noisy_lidar_pose.shape[0] #代理的数量
+    order = 'lwh'  # hwl  
+    N = noisy_lidar_pose.shape[0] 
     lidar_pose_noisy_tfm = pose_to_tfm(noisy_lidar_pose)
-    #创建列表，表示是否检测到Object
+   
     nonempty_indices = [idx for (idx, corners) in enumerate(pred_corners_list) if len(corners)!=0] # if one agent detects no boxes, its corners is just [].
-    #转换为世界坐标系
+  
     pred_corners_world_list = \
         [box_utils.project_box3d(pred_corners_list[i], lidar_pose_noisy_tfm[i]) for i in nonempty_indices]  # [[N1, 8, 3], [N2, 8, 3],...]
-    #计算每个box的中心点坐标
+  
     pred_box3d_list = \
         [box_utils.corner_to_center(corner, order) for corner in pred_corners_list if len(corner)!=0]   # [[N1, 7], [N2, 7], ...], angle in radian
-    #计算每个box的中心点在世界坐标系中的坐标
+   
     pred_box3d_world_list = \
         [box_utils.corner_to_center(corner, order) for corner in pred_corners_world_list]   # [[N1, 7], [N2, 7], ...], angle in radian
-    #计算每个box中心点坐标的均值
+ 
     pred_center_list = \
         [np.mean(corners, axis=1) for corners in pred_corners_list if len(corners)!=0] # [[N1,3], [N2,3], ...]
 
@@ -397,11 +397,10 @@ def box_alignment_relative_sample_np(
 
 
     """
-    传进来一共两个agent
-    box_idx_to_agent 用于计算每个框box与代理agent之间建立映射关系,内容为每个框对应代理的索引
-    例如：
+ 
+
     Number of Agent:  2
-    Number of Box: [18, 20]  属于索引为0的代理的box一共有18个,属于第二个代理的box一共有20个 
+    Number of Box: [18, 20]  
     box_idx_to_agent [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
     coordinate of Agent: (2, 6)--->(2,4,4)
     pred_center_world_cat :(38, 3)
@@ -417,9 +416,9 @@ def box_alignment_relative_sample_np(
 
 
     print("box_idx_to_agent",box_idx_to_agent)
-    #分别将中心点坐标，世界坐标系的中心点坐标，。。角度整个到单个数组中
+   
 
-    # print("coordinate of Agent",lidar_pose_noisy_tfm.shape)  #查看Agent的位姿
+    # print("coordinate of Agent",lidar_pose_noisy_tfm.shape)  
     pred_center_cat = np.concatenate(pred_center_list, axis=0)   # [sum(pred_box), 3]
     pred_center_world_cat =  np.concatenate(pred_center_world_list, axis=0)  # [sum(pred_box), 3]
     pred_box3d_cat =  np.concatenate(pred_box3d_list, axis=0)  # [sum(pred_box), 7]
@@ -429,26 +428,26 @@ def box_alignment_relative_sample_np(
     # hard-coded currently
     w_a = 1.6 # width of anchor
     l_a = 3.9 # length of anchor
-    d_a_square = w_a ** 2 + l_a ** 2 # anchor's diag  对角线的平方
-    thres_score = 0.5  #阈值分数
+    d_a_square = w_a ** 2 + l_a ** 2 # anchor's diag 
+    thres_score = 0.5 
 
 
     if uncertainty_list is not None:
-        pred_log_sigma2_cat = np.concatenate([i for i in uncertainty_list if len(i)!=0], axis=0)  #代理不确定性对数
+        pred_log_sigma2_cat = np.concatenate([i for i in uncertainty_list if len(i)!=0], axis=0)  
         pred_certainty_cat = np.exp(-pred_log_sigma2_cat)
         pred_certainty_cat[:,:2] /= d_a_square    
 
-        #将对数不确定性转化为确定性，然后归一化
+        
         if normalize_uncertainty:
             pred_certainty_cat = np.sqrt(pred_certainty_cat)
 
-    # 计算所有box中心点之间的距离矩阵
+  
     pred_center_allpair_dist = all_pair_l2(pred_center_world_cat, pred_center_world_cat) # [sum(pred_box), sum(pred_box)]
-    # 构建每个box的邻居集合，每个agent的每个box周围5m范围内的box为邻居，
-    neighbor_radius = 10.0  # 邻居构建的阈值
+ 
+    neighbor_radius = 10.0  
     pre_neighbor_set = []
-    candidate_radius = 2  # 候选集构建的阈值
-    # candidate_radius = 1  # 候选集构建的阈值
+    candidate_radius = 2 
+    # candidate_radius = 1  
     pre_candidate_set = []
 
     for box_id, pre_box_center in enumerate(pred_center_world_cat):
@@ -477,38 +476,38 @@ def box_alignment_relative_sample_np(
 
     # let pair from one vehicle be max distance
     MAX_DIST = 10000
-    cum = 0  #用于在循环中记录累计box的数量
-    for i in range(N):  #遍历所有的代理N  ，将距离矩阵两个对角线子矩阵都变成最大值，保证每个代理的box之间的距离很大，不会被分到同一个聚类中
+    cum = 0  
+    for i in range(N):  
         pred_center_allpair_dist[cum: cum + pred_len[i], cum: cum +pred_len[i]] = MAX_DIST   # do not include itself
-        cum += pred_len[i]  #更新b当前bounding box的数量
+        cum += pred_len[i] 
     
 
-    cluster_id = N # let the vertex id of object start from N 聚类起始的值为N
-    cluster_dict = OrderedDict()  #创建有序字典，保存聚类信息
-    remain_box = set(range(cum))  #创建集合，包含所有bounding box的索引，表示没有被分到任何聚类中。
+    cluster_id = N # let the vertex id of object start from N 
+    cluster_dict = OrderedDict()  
+    remain_box = set(range(cum))  
 
     candidate_set = dict() 
     candidate_set_score = dict()
     # idx_set = set()
     # candidate_idx_set = set()
 
-    target_graph_ids = list(range(pred_len[0]))  # 初始时设定0号agent图，每次完成匹配后将大图融合进入target_graph_ids
+    target_graph_ids = list(range(pred_len[0]))  
     begin_id = 0
     end_id = pred_len[0]
-    for i in range(1, N):  # 将后续agent的图融合进入target_graph_ids
+    for i in range(1, N): 
         begin_id = end_id
         end_id += pred_len[i]
         idx_set = set()
         candidate_idx_set = set()
         print("target_graph_ids",target_graph_ids)
-        #遍历每一个bounding box,
+   
         print("box id range",begin_id, end_id)
         for box_idx in range(begin_id, end_id): 
 
             within_thres_idx_tensor_ws = (pred_center_allpair_dist[box_idx] < candidate_radius).nonzero()[0]
             within_thres_idx_list_ws = within_thres_idx_tensor_ws.tolist()
             # print(box_idx, within_thres_idx_list_ws)
-            within_thres_idx_list_score = []  # 记录候选集中每个box的得分
+            within_thres_idx_list_score = []  
             within_thres_idx_list_ws_in_target = []
             if len(within_thres_idx_list_ws) == 0:  # if it's a single box
                 continue
@@ -516,9 +515,9 @@ def box_alignment_relative_sample_np(
             score_num = 0
 
             # if len(within_thres_idx_list) > 1:
-            for candidate_idx in within_thres_idx_list_ws:  # 对候选集中的每个box计算得分
+            for candidate_idx in within_thres_idx_list_ws:  
                 
-                if candidate_idx not in target_graph_ids:  # 如果候选集中的box不在target_graph_ids中，跳过
+                if candidate_idx not in target_graph_ids:  
                     continue
                 score = compute_graph_similarity(box_idx, candidate_idx, pre_candidate_set, pred_len, box_idx_to_agent, pred_center_world_cat)
                 # score = compute_graph_similarity_only_distance(box_idx, candidate_idx, pre_candidate_set, pred_len, box_idx_to_agent, pred_center_world_cat)
@@ -540,7 +539,7 @@ def box_alignment_relative_sample_np(
             
         HK_result, unmatched_nodes = weighted_bipartite_matching_hopcroft_karp(idx_set, candidate_idx_set, candidate_set, candidate_set_score)
 
-        if len(unmatched_nodes) > 0: # 存在未匹配的节点、
+        if len(unmatched_nodes) > 0: 
             # print("unmatched_nodes:: ",unmatched_nodes)
             for un_node in unmatched_nodes:
                 if un_node not in target_graph_ids:
@@ -551,13 +550,13 @@ def box_alignment_relative_sample_np(
         print(HK_result)
         
         for item in HK_result:
-            if item[0] not in remain_box and item[1] not in remain_box: # 当匹配的两个结果都已处理过
+            if item[0] not in remain_box and item[1] not in remain_box: 
                 continue
-            if item[0] not in remain_box or item[1] not in remain_box: # 表示其中一个已经被处理过，但需要将新匹配放入cluster_dict中
-                newidx = item[0] if item[0] in remain_box else item[1]  # 新放入的id
-                oldidx = item[0] if item[0] not in remain_box else item[1] # 已存在的id
-                for i in range(N, cluster_id):  # 遍历所有的聚类
-                    if oldidx in cluster_dict[i]['box_idx']:   # 找到已存在的id所在的聚类，将新放入的id放入该聚类中
+            if item[0] not in remain_box or item[1] not in remain_box: 
+                newidx = item[0] if item[0] in remain_box else item[1]  
+                oldidx = item[0] if item[0] not in remain_box else item[1] 
+                for i in range(N, cluster_id):  # 
+                    if oldidx in cluster_dict[i]['box_idx']:   # 
                         cluster_dict[i]['box_idx'].append(newidx)
                         cluster_dict[i]['box_center_world'].append(pred_center_world_cat[newidx])
                         cluster_dict[i]['box_yaw'].append(pred_yaw_world_cat[newidx])
@@ -576,15 +575,15 @@ def box_alignment_relative_sample_np(
 
 
                 continue
-            # 如果两个都没有被处理，那么创建一个匹配结果
+       
             cluster_dict[cluster_id] = OrderedDict()
             cluster_dict[cluster_id]['box_idx'] = [item[0], item[1]]
             cluster_dict[cluster_id]['box_center_world'] = [pred_center_world_cat[item[0]], pred_center_world_cat[item[1]]]
             cluster_dict[cluster_id]['box_yaw'] = [pred_yaw_world_cat[item[0]], pred_yaw_world_cat[item[1]]]
 
-            yaw_var = np.var(cluster_dict[cluster_id]['box_yaw']) #计算角度方差
-            cluster_dict[cluster_id]['box_yaw_varies'] = yaw_var > yaw_var_thres   # 方差是否大于阈值，如果是，则标记角度变化大
-            cluster_dict[cluster_id]['active'] = True #当前聚类为有效
+            yaw_var = np.var(cluster_dict[cluster_id]['box_yaw']) #
+            cluster_dict[cluster_id]['box_yaw_varies'] = yaw_var > yaw_var_thres   # 
+            cluster_dict[cluster_id]['active'] = True
 
             ########### adaptive_landmark ##################
             if landmark_SE2:  #true
@@ -593,8 +592,8 @@ def box_alignment_relative_sample_np(
                     for _box_idx in [item[0], item[1]]:
                         pred_certainty_cat[_box_idx] *= 2
                 else:
-                    landmark = copy.deepcopy(pred_center_world_cat[box_idx])  #将landmark设置为当前bounding box的中心坐标和角度
-                    landmark[2] = pred_yaw_world_cat[box_idx]  #更新landmark的角度信息，等于当前bounding box的角度
+                    landmark = copy.deepcopy(pred_center_world_cat[box_idx])  
+                    landmark[2] = pred_yaw_world_cat[box_idx] 
             else:
                 landmark = pred_center_world_cat[box_idx][:2]
             ##################################################
@@ -607,7 +606,7 @@ def box_alignment_relative_sample_np(
             remain_box.remove(item[1])
 
     # print(cluster_dict)
-    # 打印cluster_dict中的每一个'box_idx'
+   
     for i in range(N, cluster_id):
         print("box_idx",cluster_dict[i]['box_idx'])
     vertex_num = cluster_id
@@ -623,11 +622,11 @@ def box_alignment_relative_sample_np(
     """
     # abandon_hard_cases = true
     if abandon_hard_cases:
-        # case1: object num is smaller than 3，如果聚类物体数量小于3，说明物体较少，难以优化位姿，直接返回原始代理的pose信息
+        # case1: object num is smaller than 3，
         if landmark_num <= 3:
             return noisy_lidar_pose[:,[0,1,4]]
         
-        # case2: more than half of the landmarks yaw varies，如果超过一半的物体角度差异较大，直接返回代理的pose信息，跳出后续的图优化
+        # case2: more than half of the landmarks yaw varies，
         yaw_varies_cnt = sum([cluster_dict[i]["box_yaw_varies"] for i in range(agent_num, vertex_num)])
         if yaw_varies_cnt >= 0.5 * landmark_num:
             return noisy_lidar_pose[:,[0,1,4]]
@@ -636,61 +635,60 @@ def box_alignment_relative_sample_np(
 
     if drop_hard_boxes:
         for landmark_id in range(agent_num, vertex_num):
-            if cluster_dict[landmark_id]['box_yaw_varies']:  #如果某物体的角度差异较大，将该物体标记为不活跃，不参与图优化
+            if cluster_dict[landmark_id]['box_yaw_varies']:  
                 cluster_dict[landmark_id]['active'] = False
 
     """
-        开始图优化
+     
         Now we have clusters for objects. we can create pose graph.
         First we consider center as landmark.
         Maybe set corner as landmarks in the future.
     """
-    pgo = PoseGraphOptimization2D()  #创建一个二维姿态图用于姿态优化
+    pgo = PoseGraphOptimization2D()  #
 
-    # Add agent to vertexs 将代理姿态添加到姿态图中
+    # Add agent to vertexs 
     for agent_id in range(agent_num):
-        v_id = agent_id  #为每个代理分配唯一的id
+        v_id = agent_id  
         # notice lidar_pose use degree format, translate it to radians.
-        pose_np = noisy_lidar_pose[agent_id, [0,1,4]]  #获取代理的位置和朝向
-        pose_np[2] = np.deg2rad(pose_np[2])  # radians 将朝向信息从度数转为弧度
-        v_pose = g2o.SE2(pose_np)   #创建一个SE2姿态对象
-        #如果是第一个代理，将代理的姿态信息添加到图中，并将其标记为固定，它的位姿信息不会变
-        # 将其他代理的姿态信息添加到图中，并将其标记为不固定，可以在后续的优化中进行调整
+        pose_np = noisy_lidar_pose[agent_id, [0,1,4]] 
+        pose_np[2] = np.deg2rad(pose_np[2])  
+        v_pose = g2o.SE2(pose_np) 
+       
         if agent_id == 0:
             pgo.add_vertex(id=v_id, pose=v_pose, fixed=True)
         else:
             pgo.add_vertex(id=v_id, pose=v_pose, fixed=False)
 
-    # Add object to vertexs 将物体（landmark）的姿态添加到姿态图中
+   
     for landmark_id in range(agent_num, vertex_num):
         v_id = landmark_id
-        landmark = cluster_dict[landmark_id]['landmark'] # (3,) or (2,) 获取物体的位置朝向
-        landmark_SE2 = cluster_dict[landmark_id]['landmark_SE2']  #判断物体的地标类型是否为SE2
-        #如果是SE2，，创建SE2对象，并使用地标信息初始化
+        landmark = cluster_dict[landmark_id]['landmark'] # (3,) or (2,) 
+        landmark_SE2 = cluster_dict[landmark_id]['landmark_SE2']  #
+        #
         if landmark_SE2:
             v_pose = g2o.SE2(landmark)
         else:
             v_pose = landmark
-        #将物体的姿态图信息添加到图中，不标记为固定，类型为SE2
+        #
         pgo.add_vertex(id=v_id, pose=v_pose, fixed=False, SE2=landmark_SE2)
 
-    # Add agent-object edge to edge set 将代理与物体之间的关联关系添加到边集
-    for landmark_id in range(agent_num, vertex_num):  #遍历所有物体
-        landmark_SE2 = cluster_dict[landmark_id]['landmark_SE2']  #获取物体的地标类型
-        #如果物体地标类型不是活跃的，跳过，不与之关联
+    # Add agent-object edge to edge set
+    for landmark_id in range(agent_num, vertex_num): 
+        landmark_SE2 = cluster_dict[landmark_id]['landmark_SE2']  
+
         if not cluster_dict[landmark_id]['active']:
             continue
-        #遍历所有与物体关联的框
+      
         for box_idx in cluster_dict[landmark_id]['box_idx']:
-            agent_id = box_idx_to_agent[box_idx]  #找到与bounding box关联的代理id
+            agent_id = box_idx_to_agent[box_idx]  
             if landmark_SE2:
-                e_pose = g2o.SE2(pred_box3d_cat[box_idx][[0,1,6]].astype(np.float64)) #创建一个SE2类型的边，使用框的位置和朝向信息初始化
-                info = np.identity(3, dtype=np.float64)  #创建一个3*3的单位矩阵作为信息矩阵，用于优化权重
-                if uncertainty_list is not None:  #如果提供了不确定性信息
-                    info[[0,1,2],[0,1,2]] = pred_certainty_cat[box_idx] #根据不确定信息更新信息矩阵的对角线元素
+                e_pose = g2o.SE2(pred_box3d_cat[box_idx][[0,1,6]].astype(np.float64)) 
+                info = np.identity(3, dtype=np.float64) 
+                if uncertainty_list is not None: 
+                    info[[0,1,2],[0,1,2]] = pred_certainty_cat[box_idx] 
 
                     ############ drop_unsure_edge ###########
-                    if drop_unsure_edge and sum(pred_certainty_cat[box_idx]) < 100:  #如果不确定性总和小于100，跳过这个边
+                    if drop_unsure_edge and sum(pred_certainty_cat[box_idx]) < 100:  
                         continue
 
             else:
@@ -702,40 +700,40 @@ def box_alignment_relative_sample_np(
                     ############ drop_unsure_edge ############
                     if drop_unsure_edge and sum(pred_certainty_cat[box_idx]) < 100:
                         continue
-            #将边信息添加到姿态图中，表示代理和物体之间的关联
+          
             pgo.add_edge(vertices=[agent_id, landmark_id], measurement=e_pose, information=info, SE2=landmark_SE2)
     
-    pgo.optimize(max_iterations)  #对姿态图进行优化，最大化迭代次数
+    pgo.optimize(max_iterations)  
 
-    pose_new_list = []  #创建一个空列表，用于存储优化后的姿态信息
-    for agent_id in range(agent_num):  #遍历所有代理
+    pose_new_list = []  
+    for agent_id in range(agent_num): 
         # print(pgo.get_pose(agent_id).vector())
-        pose_new_list.append(pgo.get_pose(agent_id).vector()) #获取并添加每个代理优化后的姿态信息
+        pose_new_list.append(pgo.get_pose(agent_id).vector()) 
 
-    refined_pose = np.array(pose_new_list)  #将优化后的姿态信息转换为Numpy数组
-    refined_pose[:,2] = np.rad2deg(refined_pose[:,2])  # rad -> degree, same as source #将姿态信息的朝向从弧度转为度数
-    # 将数据附加到TXT文件的末尾
+    refined_pose = np.array(pose_new_list)  
+    refined_pose[:,2] = np.rad2deg(refined_pose[:,2])  # rad -> degree, same as source 
+
     # with open('/home/hz/code/opencood/logs/Other_results/noisy_lidar_pose_AfterAlign.txt', 'a') as f:
     #     for row in refined_pose:
     #         f.write(' '.join(map(str, row)) + '\n')
     # print("Data has been appended to noisy_lidar_pose_AfterAlign.txt file.")
-    return refined_pose  #返回优化后的姿态信息，包括位置和朝向
+    return refined_pose  
 
-# 直接使用图结构来匹配和过滤
+
 def box_alignment_relative_sample_np_direct(
-            pred_corners_list,     #当前代理的3D框坐标列表
-            noisy_lidar_pose,      #代理的姿态信息，包括位置和朝向
+            pred_corners_list,     
+            noisy_lidar_pose,     
             uncertainty_list=None, 
-            landmark_SE2=True,   #landmark类型为SE2
+            landmark_SE2=True,   
             adaptive_landmark=False,
             normalize_uncertainty=False,
             abandon_hard_cases = False,
-            drop_hard_boxes = False,  ##放弃处理困难的框
-            drop_unsure_edge = False, #放弃处理不确定的情况
+            drop_hard_boxes = False,  
+            drop_unsure_edge = False, 
             use_uncertainty = True,
-            thres = 1.5,     #确定相邻框的距离阈值
-            yaw_var_thres = 0.2,    #用于确定框姿态角差异的阈值
-            max_iterations = 1000):  #最优迭代的最大次数
+            thres = 1.5,   
+            yaw_var_thres = 0.2,   
+            max_iterations = 1000):  
     """ Perform box alignment for one sample. 
     Correcting the relative pose.
 
@@ -770,25 +768,25 @@ def box_alignment_relative_sample_np_direct(
         refined_lidar_poses: np.ndarray
             [N_cav1, 3], 
     """
-    # print("图优化开始=====")
+
     if not use_uncertainty:
         uncertainty_list = None
     ## first transform point from ego coordinate to world coordinate, using lidar_pose.
-    order = 'lwh'  # hwl  定义框的尺寸顺序为长度，宽度，高度
-    N = noisy_lidar_pose.shape[0] #代理的数量
+    order = 'lwh'  # hwl 
+    N = noisy_lidar_pose.shape[0]
     lidar_pose_noisy_tfm = pose_to_tfm(noisy_lidar_pose)
-    #创建列表，表示是否检测到Object
+
     nonempty_indices = [idx for (idx, corners) in enumerate(pred_corners_list) if len(corners)!=0] # if one agent detects no boxes, its corners is just [].
-    #转换为世界坐标系
+
     pred_corners_world_list = \
         [box_utils.project_box3d(pred_corners_list[i], lidar_pose_noisy_tfm[i]) for i in nonempty_indices]  # [[N1, 8, 3], [N2, 8, 3],...]
-    #计算每个box的中心点坐标
+
     pred_box3d_list = \
         [box_utils.corner_to_center(corner, order) for corner in pred_corners_list if len(corner)!=0]   # [[N1, 7], [N2, 7], ...], angle in radian
-    #计算每个box的中心点在世界坐标系中的坐标
+
     pred_box3d_world_list = \
         [box_utils.corner_to_center(corner, order) for corner in pred_corners_world_list]   # [[N1, 7], [N2, 7], ...], angle in radian
-    #计算每个box中心点坐标的均值
+
     pred_center_list = \
         [np.mean(corners, axis=1) for corners in pred_corners_list if len(corners)!=0] # [[N1,3], [N2,3], ...]
 
@@ -801,11 +799,10 @@ def box_alignment_relative_sample_np_direct(
 
 
     """
-    传进来一共两个agent
-    box_idx_to_agent 用于计算每个框box与代理agent之间建立映射关系,内容为每个框对应代理的索引
+
     例如：
     Number of Agent:  2
-    Number of Box: [18, 20]  属于索引为0的代理的box一共有18个,属于第二个代理的box一共有20个 
+    Number of Box: [18, 20] 
     box_idx_to_agent [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
     coordinate of Agent: (2, 6)--->(2,4,4)
     pred_center_world_cat :(38, 3)
@@ -821,9 +818,9 @@ def box_alignment_relative_sample_np_direct(
 
 
     print("box_idx_to_agent",box_idx_to_agent)
-    #分别将中心点坐标，世界坐标系的中心点坐标，。。角度整个到单个数组中
+   
 
-    # print("coordinate of Agent",lidar_pose_noisy_tfm.shape)  #查看Agent的位姿
+    # print("coordinate of Agent",lidar_pose_noisy_tfm.shape) 
     pred_center_cat = np.concatenate(pred_center_list, axis=0)   # [sum(pred_box), 3]
     pred_center_world_cat =  np.concatenate(pred_center_world_list, axis=0)  # [sum(pred_box), 3]
     pred_box3d_cat =  np.concatenate(pred_box3d_list, axis=0)  # [sum(pred_box), 7]
@@ -833,24 +830,24 @@ def box_alignment_relative_sample_np_direct(
     # hard-coded currently
     w_a = 1.6 # width of anchor
     l_a = 3.9 # length of anchor
-    d_a_square = w_a ** 2 + l_a ** 2 # anchor's diag  对角线的平方
+    d_a_square = w_a ** 2 + l_a ** 2 # anchor's diag  
 
 
     if uncertainty_list is not None:
-        pred_log_sigma2_cat = np.concatenate([i for i in uncertainty_list if len(i)!=0], axis=0)  #代理不确定性对数
+        pred_log_sigma2_cat = np.concatenate([i for i in uncertainty_list if len(i)!=0], axis=0)  
         pred_certainty_cat = np.exp(-pred_log_sigma2_cat)
         pred_certainty_cat[:,:2] /= d_a_square    
 
-        #将对数不确定性转化为确定性，然后归一化
+     
         if normalize_uncertainty:
             pred_certainty_cat = np.sqrt(pred_certainty_cat)
 
-    # 计算所有box中心点之间的距离矩阵
+
     pred_center_allpair_dist = all_pair_l2(pred_center_world_cat, pred_center_world_cat) # [sum(pred_box), sum(pred_box)]
-    # 构建每个box的邻居集合，每个agent的每个box周围5m范围内的box为邻居，
-    neighbor_radius = 10.0  # 邻居构建的阈值
+
+    neighbor_radius = 10.0 
     pre_neighbor_set = []
-    candidate_radius = l_a  # 候选集构建的阈值
+    candidate_radius = l_a  
     pre_candidate_set = []
 
     for box_id, pre_box_center in enumerate(pred_center_world_cat):
@@ -869,45 +866,45 @@ def box_alignment_relative_sample_np_direct(
 
     # let pair from one vehicle be max distance
     MAX_DIST = 10000
-    cum = 0  #用于在循环中记录累计box的数量
-    for i in range(N):  #遍历所有的代理N  ，将距离矩阵两个对角线子矩阵都变成最大值，保证每个代理的box之间的距离很大，不会被分到同一个聚类中
+    cum = 0  
+    for i in range(N):  
         pred_center_allpair_dist[cum: cum + pred_len[i], cum: cum +pred_len[i]] = MAX_DIST   # do not include itself
-        cum += pred_len[i]  #更新b当前bounding box的数量
+        cum += pred_len[i]  
     
 
-    cluster_id = N # let the vertex id of object start from N 聚类起始的值为N
-    cluster_dict = OrderedDict()  #创建有序字典，保存聚类信息
-    remain_box = set(range(cum))  #创建集合，包含所有bounding box的索引，表示没有被分到任何聚类中。
+    cluster_id = N # let the vertex id of object start from N 
+    cluster_dict = OrderedDict()  
+    remain_box = set(range(cum))  
 
     candidate_set = dict() 
     candidate_set_score = dict()
     idx_set = set()
     candidate_idx_set = set()
 
-    # target_graph_ids = list(range(pred_len[0]))  # 初始时设定0号agent图，每次完成匹配后将大图融合进入target_graph_ids
+    # target_graph_ids = list(range(pred_len[0]))  
     
-    #遍历每一个bounding box,
+
     for box_idx in range(cum): 
 
-        if box_idx not in remain_box:  # already assigned  如果ID没有在 remain_box里，就跳过，表示已经被处理过
+        if box_idx not in remain_box:  # already assigned  
             continue
 
         within_thres_idx_tensor_ws = (pred_center_allpair_dist[box_idx] < candidate_radius).nonzero()[0]
-        within_thres_idx_list_ws = within_thres_idx_tensor_ws.tolist()  # 候选集中的box的索引列表
+        within_thres_idx_list_ws = within_thres_idx_tensor_ws.tolist()  # 
         # print(box_idx, within_thres_idx_list_ws)
-        within_thres_idx_list_score = []  # 记录候选集中每个box的得分
+        within_thres_idx_list_score = []  # 
         if len(within_thres_idx_list_ws) == 0:  # if it's a single box
             continue
         
         explored = [box_idx]
       
-        agent_candidates = [] # 记录当前box属于各个代理的候选集
-        agent_candidates_score = [] # 记录当前box属于各个代理的候选集
+        agent_candidates = [] #
+        agent_candidates_score = [] # 
         for i in range(N-1):
             agent_candidates.append([])
             agent_candidates_score.append([])
-        for candidate_idx in within_thres_idx_list_ws:  # 对候选集中的每个box计算得分
-            if candidate_idx not in remain_box:  # 如果候选集中的box不在remain_box中，跳过
+        for candidate_idx in within_thres_idx_list_ws:  #
+            if candidate_idx not in remain_box:  # 
                 continue
             score = compute_graph_similarity(box_idx, candidate_idx, pre_candidate_set, pred_len, box_idx_to_agent, pred_center_world_cat)
             
@@ -918,27 +915,27 @@ def box_alignment_relative_sample_np_direct(
         for i in range(N-1):
             if len(agent_candidates[i]) == 0:
                 continue
-            # 获取agent_candidates[i]中的最大值对应的索引
+ 
             max_idx = agent_candidates_score[i].index(max(agent_candidates_score[i]))
             if(max(agent_candidates_score[i]) > 1e-3):
                 continue
             explored.append(agent_candidates[i][max_idx])
     
-        # 如果只有一个索引，表示这个bounding box没有相邻的框，所以被单独分成一个聚类
+       
         if len(explored) == 1: # it's a single box, neighbors have been assigned
             remain_box.remove(box_idx)
             continue
 
-        cluster_box_idxs = explored  #将探索完成的bounding box列表作为当前聚类的box索引列表
+        cluster_box_idxs = explored  
 
-        cluster_dict[cluster_id] = OrderedDict()  #创建有序字典，存储聚类信息
-        cluster_dict[cluster_id]['box_idx'] = [idx for idx in cluster_box_idxs]  #存储box的索引列表
+        cluster_dict[cluster_id] = OrderedDict()  
+        cluster_dict[cluster_id]['box_idx'] = [idx for idx in cluster_box_idxs] 
         cluster_dict[cluster_id]['box_center_world'] = [pred_center_world_cat[idx] for idx in cluster_box_idxs]  # 存坐标 coordinate in world, [3,]
-        cluster_dict[cluster_id]['box_yaw'] = [pred_yaw_world_cat[idx] for idx in cluster_box_idxs] #存角度
+        cluster_dict[cluster_id]['box_yaw'] = [pred_yaw_world_cat[idx] for idx in cluster_box_idxs] 
 
-        yaw_var = np.var(cluster_dict[cluster_id]['box_yaw']) #计算角度方差
-        cluster_dict[cluster_id]['box_yaw_varies'] = yaw_var > yaw_var_thres   # 方差是否大于阈值，如果是，则标记角度变化大
-        cluster_dict[cluster_id]['active'] = True #当前聚类为有效
+        yaw_var = np.var(cluster_dict[cluster_id]['box_yaw']) 
+        cluster_dict[cluster_id]['box_yaw_varies'] = yaw_var > yaw_var_thres   
+        cluster_dict[cluster_id]['active'] = True 
 
 
         ########### adaptive_landmark ##################
@@ -948,8 +945,8 @@ def box_alignment_relative_sample_np_direct(
                 for _box_idx in cluster_box_idxs:
                     pred_certainty_cat[_box_idx] *= 2
             else:
-                landmark = copy.deepcopy(pred_center_world_cat[box_idx])  #将landmark设置为当前bounding box的中心坐标和角度
-                landmark[2] = pred_yaw_world_cat[box_idx]  #更新landmark的角度信息，等于当前bounding box的角度
+                landmark = copy.deepcopy(pred_center_world_cat[box_idx])  
+                landmark[2] = pred_yaw_world_cat[box_idx]  
         else:
             landmark = pred_center_world_cat[box_idx][:2]
         ##################################################
@@ -966,9 +963,9 @@ def box_alignment_relative_sample_np_direct(
             ic(cluster_dict[cluster_id]['box_yaw'])
             ic(cluster_dict[cluster_id]['landmark'])
         
-        # 递增聚类的ID，准备处理下一个聚类
+
         cluster_id += 1
-        #遍历bounding box索引列表，移除已经分配到聚类中的bounding box
+    
         for idx in cluster_box_idxs:
             remain_box.remove(idx)
 
@@ -986,11 +983,11 @@ def box_alignment_relative_sample_np_direct(
     """
     # abandon_hard_cases = true
     if abandon_hard_cases:
-        # case1: object num is smaller than 3，如果聚类物体数量小于3，说明物体较少，难以优化位姿，直接返回原始代理的pose信息
+        # case1: object num is smaller than 3，
         if landmark_num <= 3:
             return noisy_lidar_pose[:,[0,1,4]]
         
-        # case2: more than half of the landmarks yaw varies，如果超过一半的物体角度差异较大，直接返回代理的pose信息，跳出后续的图优化
+        # case2: more than half of the landmarks yaw varies，
         yaw_varies_cnt = sum([cluster_dict[i]["box_yaw_varies"] for i in range(agent_num, vertex_num)])
         if yaw_varies_cnt >= 0.5 * landmark_num:
             return noisy_lidar_pose[:,[0,1,4]]
@@ -999,61 +996,60 @@ def box_alignment_relative_sample_np_direct(
 
     if drop_hard_boxes:
         for landmark_id in range(agent_num, vertex_num):
-            if cluster_dict[landmark_id]['box_yaw_varies']:  #如果某物体的角度差异较大，将该物体标记为不活跃，不参与图优化
+            if cluster_dict[landmark_id]['box_yaw_varies']:  
                 cluster_dict[landmark_id]['active'] = False
 
     """
-        开始图优化
+
         Now we have clusters for objects. we can create pose graph.
         First we consider center as landmark.
         Maybe set corner as landmarks in the future.
     """
-    pgo = PoseGraphOptimization2D()  #创建一个二维姿态图用于姿态优化
+    pgo = PoseGraphOptimization2D() 
 
-    # Add agent to vertexs 将代理姿态添加到姿态图中
+    # Add agent to vertexs 
     for agent_id in range(agent_num):
-        v_id = agent_id  #为每个代理分配唯一的id
+        v_id = agent_id  
         # notice lidar_pose use degree format, translate it to radians.
-        pose_np = noisy_lidar_pose[agent_id, [0,1,4]]  #获取代理的位置和朝向
-        pose_np[2] = np.deg2rad(pose_np[2])  # radians 将朝向信息从度数转为弧度
-        v_pose = g2o.SE2(pose_np)   #创建一个SE2姿态对象
-        #如果是第一个代理，将代理的姿态信息添加到图中，并将其标记为固定，它的位姿信息不会变
-        # 将其他代理的姿态信息添加到图中，并将其标记为不固定，可以在后续的优化中进行调整
+        pose_np = noisy_lidar_pose[agent_id, [0,1,4]] 
+        pose_np[2] = np.deg2rad(pose_np[2])  # radians 
+        v_pose = g2o.SE2(pose_np)  
+    
         if agent_id == 0:
             pgo.add_vertex(id=v_id, pose=v_pose, fixed=True)
         else:
             pgo.add_vertex(id=v_id, pose=v_pose, fixed=False)
 
-    # Add object to vertexs 将物体（landmark）的姿态添加到姿态图中
+   
     for landmark_id in range(agent_num, vertex_num):
         v_id = landmark_id
-        landmark = cluster_dict[landmark_id]['landmark'] # (3,) or (2,) 获取物体的位置朝向
-        landmark_SE2 = cluster_dict[landmark_id]['landmark_SE2']  #判断物体的地标类型是否为SE2
-        #如果是SE2，，创建SE2对象，并使用地标信息初始化
+        landmark = cluster_dict[landmark_id]['landmark'] # (3,) or (2,)
+        landmark_SE2 = cluster_dict[landmark_id]['landmark_SE2']  
+
         if landmark_SE2:
             v_pose = g2o.SE2(landmark)
         else:
             v_pose = landmark
-        #将物体的姿态图信息添加到图中，不标记为固定，类型为SE2
+       
         pgo.add_vertex(id=v_id, pose=v_pose, fixed=False, SE2=landmark_SE2)
 
-    # Add agent-object edge to edge set 将代理与物体之间的关联关系添加到边集
-    for landmark_id in range(agent_num, vertex_num):  #遍历所有物体
-        landmark_SE2 = cluster_dict[landmark_id]['landmark_SE2']  #获取物体的地标类型
-        #如果物体地标类型不是活跃的，跳过，不与之关联
+    # Add agent-object edge to edge set 
+    for landmark_id in range(agent_num, vertex_num): 
+        landmark_SE2 = cluster_dict[landmark_id]['landmark_SE2'] 
+
         if not cluster_dict[landmark_id]['active']:
             continue
-        #遍历所有与物体关联的框
+   
         for box_idx in cluster_dict[landmark_id]['box_idx']:
-            agent_id = box_idx_to_agent[box_idx]  #找到与bounding box关联的代理id
+            agent_id = box_idx_to_agent[box_idx]  
             if landmark_SE2:
-                e_pose = g2o.SE2(pred_box3d_cat[box_idx][[0,1,6]].astype(np.float64)) #创建一个SE2类型的边，使用框的位置和朝向信息初始化
-                info = np.identity(3, dtype=np.float64)  #创建一个3*3的单位矩阵作为信息矩阵，用于优化权重
-                if uncertainty_list is not None:  #如果提供了不确定性信息
-                    info[[0,1,2],[0,1,2]] = pred_certainty_cat[box_idx] #根据不确定信息更新信息矩阵的对角线元素
+                e_pose = g2o.SE2(pred_box3d_cat[box_idx][[0,1,6]].astype(np.float64)) 
+                info = np.identity(3, dtype=np.float64) 
+                if uncertainty_list is not None: 
+                    info[[0,1,2],[0,1,2]] = pred_certainty_cat[box_idx] 
 
                     ############ drop_unsure_edge ###########
-                    if drop_unsure_edge and sum(pred_certainty_cat[box_idx]) < 100:  #如果不确定性总和小于100，跳过这个边
+                    if drop_unsure_edge and sum(pred_certainty_cat[box_idx]) < 100:  
                         continue
 
             else:
@@ -1065,37 +1061,37 @@ def box_alignment_relative_sample_np_direct(
                     ############ drop_unsure_edge ############
                     if drop_unsure_edge and sum(pred_certainty_cat[box_idx]) < 100:
                         continue
-            #将边信息添加到姿态图中，表示代理和物体之间的关联
+
             pgo.add_edge(vertices=[agent_id, landmark_id], measurement=e_pose, information=info, SE2=landmark_SE2)
     
-    pgo.optimize(max_iterations)  #对姿态图进行优化，最大化迭代次数
+    pgo.optimize(max_iterations) 
 
-    pose_new_list = []  #创建一个空列表，用于存储优化后的姿态信息
-    for agent_id in range(agent_num):  #遍历所有代理
+    pose_new_list = []  
+    for agent_id in range(agent_num): 
         # print(pgo.get_pose(agent_id).vector())
-        pose_new_list.append(pgo.get_pose(agent_id).vector()) #获取并添加每个代理优化后的姿态信息
+        pose_new_list.append(pgo.get_pose(agent_id).vector()) 
 
-    refined_pose = np.array(pose_new_list)  #将优化后的姿态信息转换为Numpy数组
-    refined_pose[:,2] = np.rad2deg(refined_pose[:,2])  # rad -> degree, same as source #将姿态信息的朝向从弧度转为度数
+    refined_pose = np.array(pose_new_list)  
+    refined_pose[:,2] = np.rad2deg(refined_pose[:,2])  # rad -> degree, same as source 
 
-    return refined_pose  #返回优化后的姿态信息，包括位置和朝向
+    return refined_pose  
 
 
-# 原始代码中的对齐与图优化
-def box_alignment_relative_sample_np_old(   # 原始代码中的对齐与图优化
-            pred_corners_list,     #当前代理的3D框坐标列表
-            noisy_lidar_pose,      #代理的姿态信息，包括位置和朝向
+
+def box_alignment_relative_sample_np_old(   
+            pred_corners_list,    
+            noisy_lidar_pose,     
             uncertainty_list=None, 
-            landmark_SE2=True,   #landmark类型为SE2
+            landmark_SE2=True,  
             adaptive_landmark=False,
             normalize_uncertainty=False,
             abandon_hard_cases = False,
-            drop_hard_boxes = False,  ##放弃处理困难的框
-            drop_unsure_edge = False, #放弃处理不确定的情况
+            drop_hard_boxes = False,  
+            drop_unsure_edge = False, 
             use_uncertainty = True,
-            thres = 1.5,     #确定相邻框的距离阈值
-            yaw_var_thres = 0.2,    #用于确定框姿态角差异的阈值
-            max_iterations = 1000):  #最优迭代的最大次数
+            thres = 1.5,     
+            yaw_var_thres = 0.2,   
+            max_iterations = 1000): 
     """ Perform box alignment for one sample. 
     Correcting the relative pose.
 
@@ -1130,25 +1126,25 @@ def box_alignment_relative_sample_np_old(   # 原始代码中的对齐与图优�
         refined_lidar_poses: np.ndarray
             [N_cav1, 3], 
     """
-    print("图优化开始=====")
+ 
     if not use_uncertainty:
         uncertainty_list = None
     ## first transform point from ego coordinate to world coordinate, using lidar_pose.
-    order = 'lwh'  # hwl  定义框的尺寸顺序为长度，宽度，高度
-    N = noisy_lidar_pose.shape[0] #代理的数量
+    order = 'lwh'  # hwl  
+    N = noisy_lidar_pose.shape[0]
     lidar_pose_noisy_tfm = pose_to_tfm(noisy_lidar_pose)
-    #创建列表，表示是否检测到Object
+
     nonempty_indices = [idx for (idx, corners) in enumerate(pred_corners_list) if len(corners)!=0] # if one agent detects no boxes, its corners is just [].
-    #转换为世界坐标系
+
     pred_corners_world_list = \
         [box_utils.project_box3d(pred_corners_list[i], lidar_pose_noisy_tfm[i]) for i in nonempty_indices]  # [[N1, 8, 3], [N2, 8, 3],...]
-    #计算每个box的中心点坐标
+  
     pred_box3d_list = \
         [box_utils.corner_to_center(corner, order) for corner in pred_corners_list if len(corner)!=0]   # [[N1, 7], [N2, 7], ...], angle in radian
-    #计算每个box的中心点在世界坐标系中的坐标
+  
     pred_box3d_world_list = \
         [box_utils.corner_to_center(corner, order) for corner in pred_corners_world_list]   # [[N1, 7], [N2, 7], ...], angle in radian
-    #计算每个box中心点坐标的均值
+   
     pred_center_list = \
         [np.mean(corners, axis=1) for corners in pred_corners_list if len(corners)!=0] # [[N1,3], [N2,3], ...]
 
@@ -1161,11 +1157,9 @@ def box_alignment_relative_sample_np_old(   # 原始代码中的对齐与图优�
 
 
     """
-    传进来一共两个代理
-    box_idx_to_agent 用于计算每个框box与代理agent之间建立映射关系,内容为每个框对应代理的索引
-    例如：
+
     Number of Agent:  2
-    Number of Box: [18, 20]  属于索引为0的代理的box一共有18个,属于第二个代理的box一共有20个 
+    Number of Box: [18, 20]
     box_idx_to_agent [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
     coordinate of Agent: (2, 6)--->(2,4,4)
     pred_center_world_cat :(38, 3)
@@ -1181,9 +1175,9 @@ def box_alignment_relative_sample_np_old(   # 原始代码中的对齐与图优�
 
 
     print("box_idx_to_agent",box_idx_to_agent)
-    #分别将中心点坐标，世界坐标系的中心点坐标，。。角度整个到单个数组中
 
-    print("coordinate of Agent",lidar_pose_noisy_tfm.shape)  #查看Agent的位姿
+
+    print("coordinate of Agent",lidar_pose_noisy_tfm.shape)  
     pred_center_cat = np.concatenate(pred_center_list, axis=0)   # [sum(pred_box), 3]
     pred_center_world_cat =  np.concatenate(pred_center_world_list, axis=0)  # [sum(pred_box), 3]
     pred_box3d_cat =  np.concatenate(pred_box3d_list, axis=0)  # [sum(pred_box), 7]
@@ -1193,78 +1187,77 @@ def box_alignment_relative_sample_np_old(   # 原始代码中的对齐与图优�
     # hard-coded currently
     w_a = 1.6 # width of anchor
     l_a = 3.9 # length of anchor
-    d_a_square = w_a ** 2 + l_a ** 2 # anchor's diag  对角线的平方
+    d_a_square = w_a ** 2 + l_a ** 2 # anchor's diag 
 
 
     if uncertainty_list is not None:
-        pred_log_sigma2_cat = np.concatenate([i for i in uncertainty_list if len(i)!=0], axis=0)  #代理不确定性对数
+        pred_log_sigma2_cat = np.concatenate([i for i in uncertainty_list if len(i)!=0], axis=0)  
         pred_certainty_cat = np.exp(-pred_log_sigma2_cat)
         pred_certainty_cat[:,:2] /= d_a_square    
 
-        #将对数不确定性转化为确定性，然后归一化
+   
         if normalize_uncertainty:
             pred_certainty_cat = np.sqrt(pred_certainty_cat)
 
-    # 计算所有box中心点之间的距离矩阵
+
     pred_center_allpair_dist = all_pair_l2(pred_center_world_cat, pred_center_world_cat) # [sum(pred_box), sum(pred_box)]
 
     # let pair from one vehicle be max distance
     MAX_DIST = 10000
-    cum = 0  #用于在循环中记录累计box的数量
-    for i in range(N):  #遍历所有的代理N  ，将距离矩阵两个对角线子矩阵都变成最大值，保证每个代理的box之间的距离很大，不会被分到同一个聚类中
+    cum = 0  
+    for i in range(N): 
         pred_center_allpair_dist[cum: cum + pred_len[i], cum: cum +pred_len[i]] = MAX_DIST   # do not include itself
-        cum += pred_len[i]  #更新b当前bounding box的数量
+        cum += pred_len[i]  
     print(pred_center_allpair_dist)
     print(N)
 
-    cluster_id = N # let the vertex id of object start from N 聚类起始的值为N
-    cluster_dict = OrderedDict()  #创建有序字典，保存聚类信息
-    remain_box = set(range(cum))  #创建集合，包含所有bounding box的索引，表示没有被分到任何聚类中。
+    cluster_id = N # let the vertex id of object start from N 
+    cluster_dict = OrderedDict() 
+    remain_box = set(range(cum)) 
     #遍历每一个bounding box,
     for box_idx in range(cum): 
 
-        if box_idx not in remain_box:  # already assigned  如果ID没有在 remain_box里，就跳过，表示已经被处理过
+        if box_idx not in remain_box:  # already assigned 
             continue
         
-        #找到与当前bounding box距离在阈值内的其他box的索引，将他们存储
+ 
         within_thres_idx_tensor = (pred_center_allpair_dist[box_idx] < thres).nonzero()[0]
         within_thres_idx_list = within_thres_idx_tensor.tolist()
         
-        #如果没有距离当前的bounding box的框，继续下一个box处理
+      
         if len(within_thres_idx_list) == 0:  # if it's a single box
             continue
         
-        #从 within_thres_idx_list 开始，找到所有距离在阈值内的box，并添加到同一个聚类中。
+        #从 within_thres_idx_list 
         # start from within_thres_idx_list, find new box added to the cluster
         explored = [box_idx]
-        unexplored = [idx for idx in within_thres_idx_list if idx in remain_box]  #存储尚未探索的相邻框的索引
+        unexplored = [idx for idx in within_thres_idx_list if idx in remain_box]  
 
         while unexplored:
             idx = unexplored[0]
-            within_thres_idx_tensor = (pred_center_allpair_dist[box_idx] < thres).nonzero()[0] #重新计算
+            within_thres_idx_tensor = (pred_center_allpair_dist[box_idx] < thres).nonzero()[0] 
             within_thres_idx_list = within_thres_idx_tensor.tolist()
-            #检查所有新找到的box，并添加到explored列表中，同时从unexplored中移除
+           
             for newidx in within_thres_idx_list:
                 if (newidx not in explored) and (newidx not in unexplored) and (newidx in remain_box):
                     unexplored.append(newidx)
             unexplored.remove(idx)
             explored.append(idx)
         
-        # 如果只有一个索引，表示这个bounding box没有相邻的框，所以被单独分成一个聚类
+       
         if len(explored) == 1: # it's a single box, neighbors have been assigned
             remain_box.remove(box_idx)
             continue
         
-        cluster_box_idxs = explored  #将探索完成的bounding box列表作为当前聚类的box索引列表
+        cluster_box_idxs = explored  
 
-        cluster_dict[cluster_id] = OrderedDict()  #创建有序字典，存储聚类信息
-        cluster_dict[cluster_id]['box_idx'] = [idx for idx in cluster_box_idxs]  #存储box的索引列表
-        cluster_dict[cluster_id]['box_center_world'] = [pred_center_world_cat[idx] for idx in cluster_box_idxs]  # 存坐标 coordinate in world, [3,]
-        cluster_dict[cluster_id]['box_yaw'] = [pred_yaw_world_cat[idx] for idx in cluster_box_idxs] #存角度
-
-        yaw_var = np.var(cluster_dict[cluster_id]['box_yaw']) #计算角度方差
-        cluster_dict[cluster_id]['box_yaw_varies'] = yaw_var > yaw_var_thres   # 方差是否大于阈值，如果是，则标记角度变化大
-        cluster_dict[cluster_id]['active'] = True #当前聚类为有效
+        cluster_dict[cluster_id] = OrderedDict()  
+        cluster_dict[cluster_id]['box_idx'] = [idx for idx in cluster_box_idxs]  
+        cluster_dict[cluster_id]['box_center_world'] = [pred_center_world_cat[idx] for idx in cluster_box_idxs]  # coordinate in world, [3,]
+        cluster_dict[cluster_id]['box_yaw'] = [pred_yaw_world_cat[idx] for idx in cluster_box_idxs] 
+        yaw_var = np.var(cluster_dict[cluster_id]['box_yaw']) 
+        cluster_dict[cluster_id]['box_yaw_varies'] = yaw_var > yaw_var_thres   
+        cluster_dict[cluster_id]['active'] = True 
 
 
         ########### adaptive_landmark ##################
@@ -1274,8 +1267,8 @@ def box_alignment_relative_sample_np_old(   # 原始代码中的对齐与图优�
                 for _box_idx in cluster_box_idxs:
                     pred_certainty_cat[_box_idx] *= 2
             else:
-                landmark = copy.deepcopy(pred_center_world_cat[box_idx])  #将landmark设置为当前bounding box的中心坐标和角度
-                landmark[2] = pred_yaw_world_cat[box_idx]  #更新landmark的角度信息，等于当前bounding box的角度
+                landmark = copy.deepcopy(pred_center_world_cat[box_idx])  
+                landmark[2] = pred_yaw_world_cat[box_idx] 
         else:
             landmark = pred_center_world_cat[box_idx][:2]
         ##################################################
@@ -1292,9 +1285,9 @@ def box_alignment_relative_sample_np_old(   # 原始代码中的对齐与图优�
             ic(cluster_dict[cluster_id]['box_yaw'])
             ic(cluster_dict[cluster_id]['landmark'])
         
-        # 递增聚类的ID，准备处理下一个聚类
+
         cluster_id += 1
-        #遍历bounding box索引列表，移除已经分配到聚类中的bounding box
+    
         for idx in cluster_box_idxs:
             remain_box.remove(idx)
 
@@ -1312,11 +1305,11 @@ def box_alignment_relative_sample_np_old(   # 原始代码中的对齐与图优�
     """
     # abandon_hard_cases = true
     if abandon_hard_cases:
-        # case1: object num is smaller than 3，如果聚类物体数量小于3，说明物体较少，难以优化位姿，直接返回原始代理的pose信息
+        # case1: object num is smaller than 3，
         if landmark_num <= 3:
             return noisy_lidar_pose[:,[0,1,4]]
         
-        # case2: more than half of the landmarks yaw varies，如果超过一半的物体角度差异较大，直接返回代理的pose信息，跳出后续的图优化
+        # case2: more than half of the landmarks yaw varies，
         yaw_varies_cnt = sum([cluster_dict[i]["box_yaw_varies"] for i in range(agent_num, vertex_num)])
         if yaw_varies_cnt >= 0.5 * landmark_num:
             return noisy_lidar_pose[:,[0,1,4]]
@@ -1325,61 +1318,61 @@ def box_alignment_relative_sample_np_old(   # 原始代码中的对齐与图优�
 
     if drop_hard_boxes:
         for landmark_id in range(agent_num, vertex_num):
-            if cluster_dict[landmark_id]['box_yaw_varies']:  #如果某物体的角度差异较大，将该物体标记为不活跃，不参与图优化
+            if cluster_dict[landmark_id]['box_yaw_varies']: 
                 cluster_dict[landmark_id]['active'] = False
 
     """
-        开始图优化
+
         Now we have clusters for objects. we can create pose graph.
         First we consider center as landmark.
         Maybe set corner as landmarks in the future.
     """
-    pgo = PoseGraphOptimization2D()  #创建一个二维姿态图用于姿态优化
+    pgo = PoseGraphOptimization2D() 
 
-    # Add agent to vertexs 将代理姿态添加到姿态图中
+    # Add agent to vertexs 
     for agent_id in range(agent_num):
-        v_id = agent_id  #为每个代理分配唯一的id
+        v_id = agent_id 
         # notice lidar_pose use degree format, translate it to radians.
-        pose_np = noisy_lidar_pose[agent_id, [0,1,4]]  #获取代理的位置和朝向
-        pose_np[2] = np.deg2rad(pose_np[2])  # radians 将朝向信息从度数转为弧度
-        v_pose = g2o.SE2(pose_np)   #创建一个SE2姿态对象
-        #如果是第一个代理，将代理的姿态信息添加到图中，并将其标记为固定，它的位姿信息不会变
-        # 将其他代理的姿态信息添加到图中，并将其标记为不固定，可以在后续的优化中进行调整
+        pose_np = noisy_lidar_pose[agent_id, [0,1,4]]  
+        pose_np[2] = np.deg2rad(pose_np[2])  # radians 
+        v_pose = g2o.SE2(pose_np)  
+     
+
         if agent_id == 0:
             pgo.add_vertex(id=v_id, pose=v_pose, fixed=True)
         else:
             pgo.add_vertex(id=v_id, pose=v_pose, fixed=False)
 
-    # Add object to vertexs 将物体（landmark）的姿态添加到姿态图中
+    # Add object to vertexs 
     for landmark_id in range(agent_num, vertex_num):
         v_id = landmark_id
-        landmark = cluster_dict[landmark_id]['landmark'] # (3,) or (2,) 获取物体的位置朝向
-        landmark_SE2 = cluster_dict[landmark_id]['landmark_SE2']  #判断物体的地标类型是否为SE2
-        #如果是SE2，，创建SE2对象，并使用地标信息初始化
+        landmark = cluster_dict[landmark_id]['landmark'] # (3,) or (2,) 
+        landmark_SE2 = cluster_dict[landmark_id]['landmark_SE2']  #
+        #
         if landmark_SE2:
             v_pose = g2o.SE2(landmark)
         else:
             v_pose = landmark
-        #将物体的姿态图信息添加到图中，不标记为固定，类型为SE2
+        #
         pgo.add_vertex(id=v_id, pose=v_pose, fixed=False, SE2=landmark_SE2)
 
-    # Add agent-object edge to edge set 将代理与物体之间的关联关系添加到边集
-    for landmark_id in range(agent_num, vertex_num):  #遍历所有物体
-        landmark_SE2 = cluster_dict[landmark_id]['landmark_SE2']  #获取物体的地标类型
-        #如果物体地标类型不是活跃的，跳过，不与之关联
+    # Add agent-object edge to edge set 
+    for landmark_id in range(agent_num, vertex_num):  #
+        landmark_SE2 = cluster_dict[landmark_id]['landmark_SE2']  #
+    
         if not cluster_dict[landmark_id]['active']:
             continue
-        #遍历所有与物体关联的框
+
         for box_idx in cluster_dict[landmark_id]['box_idx']:
-            agent_id = box_idx_to_agent[box_idx]  #找到与bounding box关联的代理id
+            agent_id = box_idx_to_agent[box_idx]  #
             if landmark_SE2:
-                e_pose = g2o.SE2(pred_box3d_cat[box_idx][[0,1,6]].astype(np.float64)) #创建一个SE2类型的边，使用框的位置和朝向信息初始化
-                info = np.identity(3, dtype=np.float64)  #创建一个3*3的单位矩阵作为信息矩阵，用于优化权重
-                if uncertainty_list is not None:  #如果提供了不确定性信息
-                    info[[0,1,2],[0,1,2]] = pred_certainty_cat[box_idx] #根据不确定信息更新信息矩阵的对角线元素
+                e_pose = g2o.SE2(pred_box3d_cat[box_idx][[0,1,6]].astype(np.float64)) #
+                info = np.identity(3, dtype=np.float64)  #
+                if uncertainty_list is not None:  #
+                    info[[0,1,2],[0,1,2]] = pred_certainty_cat[box_idx] #
 
                     ############ drop_unsure_edge ###########
-                    if drop_unsure_edge and sum(pred_certainty_cat[box_idx]) < 100:  #如果不确定性总和小于100，跳过这个边
+                    if drop_unsure_edge and sum(pred_certainty_cat[box_idx]) < 100:  #
                         continue
 
             else:
@@ -1391,20 +1384,20 @@ def box_alignment_relative_sample_np_old(   # 原始代码中的对齐与图优�
                     ############ drop_unsure_edge ############
                     if drop_unsure_edge and sum(pred_certainty_cat[box_idx]) < 100:
                         continue
-            #将边信息添加到姿态图中，表示代理和物体之间的关联
+
             pgo.add_edge(vertices=[agent_id, landmark_id], measurement=e_pose, information=info, SE2=landmark_SE2)
     
-    pgo.optimize(max_iterations)  #对姿态图进行优化，最大化迭代次数
+    pgo.optimize(max_iterations)  #
 
-    pose_new_list = []  #创建一个空列表，用于存储优化后的姿态信息
-    for agent_id in range(agent_num):  #遍历所有代理
+    pose_new_list = []  #
+    for agent_id in range(agent_num):  #
         # print(pgo.get_pose(agent_id).vector())
-        pose_new_list.append(pgo.get_pose(agent_id).vector()) #获取并添加每个代理优化后的姿态信息
+        pose_new_list.append(pgo.get_pose(agent_id).vector()) 
 
-    refined_pose = np.array(pose_new_list)  #将优化后的姿态信息转换为Numpy数组
-    refined_pose[:,2] = np.rad2deg(refined_pose[:,2])  # rad -> degree, same as source #将姿态信息的朝向从弧度转为度数
+    refined_pose = np.array(pose_new_list)  #
+    refined_pose[:,2] = np.rad2deg(refined_pose[:,2])  # rad -> degree, same as source 
 
-    return refined_pose  #返回优化后的姿态信息，包括位置和朝向
+    return refined_pose  #
 
 def box_alignment_relative_np(pred_corner3d_list, 
                               uncertainty_list, 
