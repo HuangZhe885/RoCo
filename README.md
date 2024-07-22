@@ -28,9 +28,9 @@ RoCo/dataset. All data configurations are the same as [CoAlign](https://github.c
 │   └── validate
 ```
 #  How to use
-(1) We are improving our project platform based on CoAlign. You just need to replace the `box_align_v2.py` and `intermedia_fusion_dataset.py` files.
+1.  We are improving our project platform based on CoAlign. You just need to replace the `box_align_v2.py` and `intermedia_fusion_dataset.py` files.
 
-(2) If you want to visualize the pose error, use `evaluate_pose_graph.py` in the `tool` folder.
+2.  If you want to visualize the pose error, use `evaluate_pose_graph.py` in the `tool` folder.
 
 #  Acknowlege
 This project is impossible without the code of OpenCOOD, g2opy and d3d.
