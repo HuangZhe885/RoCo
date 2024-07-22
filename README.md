@@ -1,4 +1,4 @@
-# RoCo  （MM2024）
+# RoCo  （MM2024 Oral）
 Robust Cooperative Perception By Iterative Object Matching and Pose Adjustment
 
 
