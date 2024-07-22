@@ -28,9 +28,11 @@ RoCo/dataset. All data configurations are the same as [CoAlign](https://github.c
 │   └── validate
 ```
 # Checkpoints and Results
-[RoCo_V2XSet]()
+* [RoCo_V2XSet](https://drive.google.com/drive/folders/12alJjt4O_0SB3vTrosz7GmrWMqM9qLn7)
 
-[RoCo_DAIR_V2X]
+* [RoCo_DAIR_V2X](https://drive.google.com/drive/folders/1iy_T6EZ-s5VcNK-5tJ81TsORHdk1165F)
+
+Download them and save them to opencood/logs
 
 #  How to use
 1.  We are improving our project platform based on CoAlign. You just need to replace the `box_align_v2.py` and `intermedia_fusion_dataset.py` files.
