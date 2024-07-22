@@ -16,13 +16,13 @@ from matplotlib import rcParams
 from scipy.stats import expon
 
 from scipy.stats import norm
-#------4.1 zh修改
+#------4.1 zh update
 
 import matplotlib.pyplot as plt
 import numpy as np
 
 # def vis_trans(trans_error_list,filenames,save_path, std):
-#       # 计算数据的范围
+#       # 
 #   plt.figure()
 #   plt.clf()
 #   for data in [trans_error_list[0], trans_error_list[2]]: 
@@ -47,20 +47,20 @@ import numpy as np
 from scipy.stats import expon
 
 def vis_trans(trans_error_list, filenames, save_path, std):
-    # 计算数据的范围
+    # 
     plt.figure()
     plt.clf()
 
-    # 遍历两个传输误差数据列表
+    # 
     for i, data in enumerate([trans_error_list[0], trans_error_list[2]]):
         param = expon.fit(data)
         x = np.linspace(0.01, max(data), 100)
         y = expon.pdf(x, *param)
         
-        # 根据索引选择线的样式
+        # 
         linestyle = '-' if i == 0 else '--'
         
-        # 绘制拟合曲线
+        # 
         plt.plot(x, y, linewidth=2, linestyle=linestyle, label=filenames[i])
 
     plt.legend()
