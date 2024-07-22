@@ -27,7 +27,8 @@ RoCo/dataset. All data configurations are the same as [CoAlign](https://github.c
 │   ├── train
 │   └── validate
 ```
-
+#  How to use
+We are improving our project platform based on CoAlign. You just need to replace the `box_align_v2.py` and `intermedia_fusion_dataset.py` files.
 
 #  Acknowlege
 This project is impossible without the code of OpenCOOD, g2opy and d3d.
