@@ -39,7 +39,7 @@ Download them and save them to  `opencood/logs`
 
 2.  If you want to visualize the pose error, use `evaluate_pose_graph.py` in the `tool` folder.
 3.  Important: During the graph matching and optimization process, the parameter `candidate_radius` needs to be adjusted according to different datasets. For specific parameter details, refer to the experiments in RoCo. https://github.com/HuangZhe885/RoCo/blob/bf9747b394fd018a8f0f3c2a3a5af6f71fadcd74/models/sub_modules/box_align_v2.py#L449
-4.  The [bounding boxes](https://drive.google.com/drive/folders/1otDzESlepuhRBE4ZgJQfpArnpG1TG8uu) used in the first phase of RoCo also come from saved files. You can download and save to `opencood/logs`,
+4.  The [bounding boxes](https://drive.google.com/drive/folders/1otDzESlepuhRBE4ZgJQfpArnpG1TG8uu) used in RoCo also come from saved files. You can download and save to `opencood/logs`,
 
 #  Acknowlege
 This project is impossible without the code of OpenCOOD, g2opy and d3d.
