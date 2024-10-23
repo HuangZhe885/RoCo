@@ -41,20 +41,21 @@ Download them and save them to  `opencood/logs`
 3.  Important: During the graph matching and optimization process, the parameter `candidate_radius` needs to be adjusted according to different datasets. For specific parameter details, refer to the experiments in RoCo. https://github.com/HuangZhe885/RoCo/blob/bf9747b394fd018a8f0f3c2a3a5af6f71fadcd74/models/sub_modules/box_align_v2.py#L449
 4.  The [bounding boxes](https://drive.google.com/drive/folders/1otDzESlepuhRBE4ZgJQfpArnpG1TG8uu) used in RoCo also come from saved files. You can download and save to `opencood/logs`,
 
-## Here are some necessary installation steps 
-1.   Create a conda environment
+
+# Here are some necessary installation steps 
+1.  Create a conda environment
    All operations should be done on machines with GPUs.
    ```
    conda create -n RoCo python=3.8 pytorch==1.12.0 torchvision==0.13.0 torchaudio==0.12.0 cudatoolkit=11.6 -c pytorch -c conda-forge
    conda activate RoCo 
    conda install git-lfs boost cuda cuda-nvcc mkl=2024.0 cmake -c conda-forge -c nvidia/label/cuda-11.6.2
    ```
-2.  Install spconv 1.2.1 or spconv 2.x
+2. Install spconv 1.2.1 or spconv 2.x
      Installing spconv 2.x is much more convenient.
     ```
-      pip install spconv-cu116
+    pip install spconv-cu116
    ```
-if you want to use Spconv 1.2.1
+3. if you want to use Spconv 1.2.1
 ```
 # STEP 1: get source code. 
 
@@ -76,9 +77,9 @@ pip install spconv-1.2.1-cp38-cp38m-linux_x86_64.whl
 python 
 import spconv
 ```
-3.  Install some other packages
-`pip install -r requirements.txt`
-4. Install RoCo
+1. Install some other packages
+```pip install -r requirements.txt```
+3. Install RoCo
 ```
 https://github.com/HuangZhe885/RoCo.git
 cd RoCo
