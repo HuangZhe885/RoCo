@@ -1,6 +1,7 @@
 # RoCo  （MM2024 Oral）
 Robust Cooperative Perception By Iterative Object Matching and Pose Adjustment
 
+[Paper](https://arxiv.org/abs/2408.00257)
 
 ![WeChat7f6b3acd42cbba3c9648bcf1fc13b3c9](https://github.com/user-attachments/assets/5674d1f6-5b57-4f09-b129-151f4130739f)
 
