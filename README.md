@@ -93,14 +93,14 @@ python opencood/utils/setup.py build_ext --inplace
 # FPVRCNN's iou_loss dependency (optional)
 python opencood/pcdet_utils/setup.py build_ext --inplace 
 ```
-# Training 训练
+# Training 
 ```
 CUDA_VISIBLE_DEVICES=0,1,2,3,4,5 python -m torch.distributed.launch  --nproc_per_node=6 --use_env opencood/tools/train_ddp.py -y YAML_FILE [--model_dir MODEL_DIR]
 ```
 * **-y YAML_FILE**  the yaml configuration file
 * **[--model_dir MODEL_FOLDER]** is optional, indicating that training continues from this log (resume training). It will read config.yaml from under** MODEL_FOLDER** instead of the input **-y YAML_FILE**. so it can be written **-y None** and no yaml file is provided
 
-# Testing 测试
+# Testing 
 ```
 python opencood/tools/inference.py --model_dir MODEL_DIR --fusion_method intermediate
 ```
